@@ -6,7 +6,6 @@
  */
 
 #include "test_module.h"
-#include "cbuffer.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -26,7 +25,6 @@ int main(){
 	int64_t arr_a[10] = {1,2,3,4,5,6,7,8,9,10};
 	int64_t arr_b[10] = {1,2,3,4,5,6,7,8,9,10};
 	int64_t arr_c[10] = {2,2,3,4,5,6,7,8,9,10};
-	CircBuffer buffer(size);
 	int a=2, b=3;
 	t.assertEqual(a, b);
 	t.assertEqual(tmp, tmp2, strlen(tmp));
