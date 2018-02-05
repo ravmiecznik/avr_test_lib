@@ -14,7 +14,7 @@
 
 #define	Q(x)	#x
 #define FUNC_NAME_GENERATOR(_NAME)	char _NAME ## _name[] = Q(_NAME)
-#define FUNC_NAME_GENERATOR_PGM(_NAME)	char _NAME ## _name[] = Q(_NAME)
+#define FUNC_NAME_GENERATOR_PGM(_NAME)	const char PROGMEM _NAME ## _name[] = Q(_NAME)
 
 class Test{
 private:
