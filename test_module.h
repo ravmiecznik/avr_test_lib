@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <avr/pgmspace.h>
 
 #define	Q(x)	#x
 #define FUNC_NAME_GENERATOR(_NAME)	char _NAME ## _name[] = Q(_NAME)
