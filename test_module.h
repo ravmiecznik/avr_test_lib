@@ -14,7 +14,7 @@
 #include <avr/pgmspace.h>
 
 #define	Q(x)	#x
-//#define FUNC_NAME_GENERATOR_PGM(_NAME)		const char _NAME ## _name[] = Q(_NAME)
+#define FUNC_NAME_GENERATOR_PGM(_NAME)		const char PROGMEM _NAME ## _name[] = Q(_NAME)
 #define FUNC_NAME_GENERATOR(_NAME)		char _NAME ## _name[] = Q(_NAME)
 
 class Test{
@@ -93,7 +93,6 @@ void Test:: assertEqual (t* a, t* b, uint16_t size, assert_type type){
 			break;
 		default:
 			break;
-
 	}
 	is_mem_equal(a, b, size) ? passed() : failed();
 }
@@ -149,11 +148,11 @@ uint16_t Test::tests_passed = 0;
 uint16_t Test::tests_failed = 0;
 
 void Test::passed(){
-	printf("passed\n");
+	printf("passed\n\n");
 }
 
 void Test::failed(){
-	printf("failed\n");
+	printf("failed\n\n");
 }
 
 #endif /* TEST_MODULE_H_ */
