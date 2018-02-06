@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #ifdef AVR_SUPPORT
 #include <avr/pgmspace.h>
@@ -22,6 +23,11 @@
 #endif
 #define FUNC_NAME_GENERATOR(_NAME)		char _NAME ## _name[] = Q(_NAME)
 
+struct UnitTest{
+	const char* name;
+	void (*unit_test)();
+};
+
 class Test{
 private:
 	template <typename t>
@@ -30,6 +36,9 @@ private:
 	bool is_mem_equal(t* a, t* b, uint16_t size=0);
 	void passed();
 	void failed();
+	UnitTest* unit_tests;
+	uint16_t unit_tests_cnt;
+	UnitTest* alloc_test();
 	static uint16_t test_count;
 	static uint16_t tests_passed;
 	static uint16_t tests_failed;
@@ -45,9 +54,21 @@ public:
 	void assertEqual(t& a, t& b, uint16_t size=0, assert_type type=numeric);
 	template <typename t>
 	void assertEqual(t* a, t* b, uint16_t size=0, assert_type type=numeric);
+	void add_test(UnitTest& test);
 	Test();
 	 ~Test();
 };
+
+UnitTest* Test::alloc_test(){
+	unit_tests_cnt++;
+	unit_tests = (UnitTest*)realloc(unit_tests, unit_tests_cnt*sizeof(UnitTest));
+	return unit_tests + unit_tests_cnt;
+}
+
+void Test::add_test(UnitTest& test){
+
+	*alloc_test() = test;
+}
 
 template <typename t>
 void Test:: assertEqual (t& a, t& b, uint16_t size, assert_type type){
@@ -139,6 +160,8 @@ Test::Test(){
 	test_count = 0;
 	tests_passed = 0;
 	tests_failed = 0;
+	unit_tests_cnt = 0;
+	unit_tests = (UnitTest*)malloc(unit_tests_cnt * sizeof(UnitTest));
 };
 
 Test::~Test(){
@@ -146,6 +169,7 @@ Test::~Test(){
 	printf("passed: %d \n", tests_passed);
 	printf("failed: %d \n", tests_failed);
 	printf("out of total tests: %d \n", test_count);
+	free(unit_tests);
 }
 
 uint16_t Test::test_count = 0;
