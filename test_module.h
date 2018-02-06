@@ -11,10 +11,15 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+
+#ifdef AVR_SUPPORT
 #include <avr/pgmspace.h>
+#endif
 
 #define	Q(x)	#x
+#ifdef AVR_SUPPORT
 #define FUNC_NAME_GENERATOR_PGM(_NAME)		const char PROGMEM _NAME ## _name[] = Q(_NAME)
+#endif
 #define FUNC_NAME_GENERATOR(_NAME)		char _NAME ## _name[] = Q(_NAME)
 
 class Test{
