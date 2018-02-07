@@ -8,10 +8,12 @@
 #ifndef TEST_MODULE_H_
 #define TEST_MODULE_H_
 
+#define AVR_SUPPORT
+
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
+#include "stdlib.h"
 
 #ifdef AVR_SUPPORT
 #include <avr/pgmspace.h>
@@ -22,6 +24,15 @@
 #define FUNC_NAME_GENERATOR_PGM(_NAME)		const char PROGMEM _NAME ## _name[] = Q(_NAME)
 #endif
 #define FUNC_NAME_GENERATOR(_NAME)		char _NAME ## _name[] = Q(_NAME)
+
+void print_test_name(const char* test_name){
+#ifdef AVR_SUPPORT
+	printf_P(test_name);
+#else
+	printf(test_name);
+#endif
+	printf("\n");
+}
 
 struct UnitTest{
 	const char* name;
@@ -51,9 +62,9 @@ public:
 		array
 	};
 	template <typename t>
-	void assertEqual(t& a, t& b, uint16_t size=0, assert_type type=numeric);
+	void assertEqual(const char* test_name, t& a, t& b, assert_type type=numeric, uint16_t size=0);
 	template <typename t>
-	void assertEqual(t* a, t* b, uint16_t size=0, assert_type type=numeric);
+	void assertEqual(const char* test_name, t* a, t* b, assert_type type=numeric, uint16_t size=0);
 	void add_test(UnitTest& test);
 	Test();
 	 ~Test();
@@ -71,21 +82,22 @@ void Test::add_test(UnitTest& test){
 }
 
 template <typename t>
-void Test:: assertEqual (t& a, t& b, uint16_t size, assert_type type){
+void Test:: assertEqual (const char* test_name, t& a, t& b, assert_type type, uint16_t size){
 	/*
 	 * template for numeric types
 	 */
+	print_test_name(test_name);
 	if(size > 0 and type != array)
 		type = string;
 	switch (type) {
 		case numeric:
-			printf("assert equal %ld=%ld ", (long int)a, (long int)b);
+			printf("assert equal %ld==%ld ", (long int)a, (long int)b);
 			break;
 		case character:
-			printf("assert equal %c=%c ", a, b);
+			printf("assert equal %c==%c ", a, b);
 			break;
 		case string:
-			printf("assert equal %s=%s ", (char*)a, (char*)b);
+			printf("assert equal %s==%s ", a, b);
 			break;
 		default:
 			break;
@@ -94,18 +106,19 @@ void Test:: assertEqual (t& a, t& b, uint16_t size, assert_type type){
 }
 
 template <typename t>
-void Test:: assertEqual (t* a, t* b, uint16_t size, assert_type type){
+void Test:: assertEqual (const char* test_name, t* a, t* b, assert_type type, uint16_t size){
+	print_test_name(test_name);
 	if(size > 0 and type != array)
 		type = string;
 	switch (type) {
 		case numeric:
-			printf("assert equal %ld=%ld ", (long int)*a, (long int)*b);
+			printf("assert equal %ld==%ld ", (long int)*a, (long int)*b);
 			break;
 		case character:
-			printf("assert equal %c=%c ", *a, *b);
+			printf("assert equal %c==%c ", *a, *b);
 			break;
 		case string:
-			printf("assert equal %s=%s ", (char*)a, (char*)b);
+			printf("assert equal %s==%s ", a, b);
 			break;
 		case array:
 			printf("assert equal ");
