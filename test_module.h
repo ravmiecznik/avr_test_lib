@@ -8,7 +8,7 @@
 #ifndef TEST_MODULE_H_
 #define TEST_MODULE_H_
 
-//#define AVR_SUPPORT
+#define AVR_SUPPORT
 
 #include <stdint.h>
 #include <stdio.h>
@@ -76,7 +76,7 @@ private:
 	static const char assert_eq_cond_s[];
 	static const char assert_not_eq_cond_s[];
 	template <typename t>
-	void print_ut_result(t val_a, t val_b, char* assertion_type, char* assert_eq_cond, char* result, variable_type type, uint16_t size=0);
+	void print_ut_result(t& val_a, t& val_b, char* assertion_type, char* assert_eq_cond, char* result, variable_type type, uint16_t size=0);
 };
 
 UnitTest* Test::alloc_test(){
@@ -111,7 +111,7 @@ void Test:: assertEqual (const char* test_name, t* a, t* b, variable_type type, 
 	if(type != array)
 		print_ut_result(a, b, assertion_type, assert_eq_cond, result, type, size);
 	else
-		print_ut_result(a[0], b[0], assertion_type, assert_eq_cond, result, type, size);
+		print_ut_result( a[0], b[0], assertion_type, assert_eq_cond, result, type, size);
 }
 
 template <typename t>
@@ -156,7 +156,7 @@ void Test:: assertNotEqual (const char* test_name, t* a, t* b, variable_type typ
 	if(type != array)
 		print_ut_result(a, b, assertion_type, assert_eq_cond, result, type, size);
 	else
-		print_ut_result(a[0], b[0], assertion_type, assert_eq_cond, result, type, size);
+		print_ut_result(a, b, assertion_type, assert_eq_cond, result, type, size);
 }
 
 template <typename t>
@@ -209,7 +209,7 @@ bool Test::is_mem_equal(t* a, t* b, uint16_t size){
 }
 
 template <typename t>
-void Test::print_ut_result(t val_a, t val_b, char* assertion_type, char* assert_eq_cond, char* result, variable_type type, uint16_t size){
+void Test::print_ut_result(t& val_a, t& val_b, char* assertion_type, char* assert_eq_cond, char* result, variable_type type, uint16_t size){
 	switch (type) {
 		case numeric:
 			printf("%s %ld %s %ld ", assertion_type, (long int)val_a, assert_eq_cond, (long int)val_b);
@@ -236,7 +236,7 @@ void Test::print_ut_result(t val_a, t val_b, char* assertion_type, char* assert_
 		default:
 			break;
 	}
-	printf("%s\n", result);
+	printf("%s\n\n", result);
 }
 
 Test::Test(){
