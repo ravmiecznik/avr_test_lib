@@ -39,6 +39,13 @@ struct UnitTest{
 	void (*unit_test)();
 };
 
+namespace verbose{
+	enum verbose{
+		yes=true,
+		no=false,
+	};
+}
+
 class Test{
 public:
 	//what kind of data is compared
@@ -49,13 +56,13 @@ public:
 		array
 	};
 	template <typename t>
-	void assertEqual(const char* test_name, t* a, t* b, variable_type type=numeric, uint16_t size=0);
+	void assertEqual(const char* test_name, t* a, t* b, variable_type type=numeric, uint16_t size=0, verbose::verbose is_verbose=verbose::yes);
 	template <typename t>
-	void assertEqual(const char* test_name, t a, t b, variable_type type=numeric, uint16_t size=0);
+	void assertEqual(const char* test_name, t a, t b, variable_type type=numeric, uint16_t size=0, verbose::verbose is_verbose=verbose::yes);
 	template <typename t>
-	void assertNotEqual(const char* test_name, t* a, t* b, variable_type type=numeric, uint16_t size=0);
+	void assertNotEqual(const char* test_name, t* a, t* b, variable_type type=numeric, uint16_t size=0, verbose::verbose is_verbose=verbose::yes);
 	template <typename t>
-	void assertNotEqual(const char* test_name, t a, t b, variable_type type=numeric, uint16_t size=0);
+	void assertNotEqual(const char* test_name, t a, t b, variable_type type=numeric, uint16_t size=0, verbose::verbose is_verbose=verbose::yes);
 	void add_test(UnitTest& test);
 	Test();
 	 ~Test();
@@ -76,7 +83,7 @@ private:
 	static const char assert_eq_cond_s[];
 	static const char assert_not_eq_cond_s[];
 	template <typename t>
-	void print_ut_result(t& val_a, t& val_b, char* assertion_type, char* assert_eq_cond, char* result, variable_type type, uint16_t size=0);
+	void print_ut_result(t& val_a, t& val_b, char* assertion_type, char* assert_eq_cond, char* result, variable_type type, uint16_t size=0, verbose::verbose is_verbose=verbose::yes);
 };
 
 UnitTest* Test::alloc_test(){
@@ -91,7 +98,7 @@ void Test::add_test(UnitTest& test){
 }
 
 template <typename t>
-void Test:: assertEqual (const char* test_name, t* a, t* b, variable_type type, uint16_t size){
+void Test:: assertEqual (const char* test_name, t* a, t* b, variable_type type, uint16_t size, verbose::verbose is_verbose){
 	print_test_name(test_name);
 	char* result;
 	char* assert_eq_cond;
@@ -109,13 +116,13 @@ void Test:: assertEqual (const char* test_name, t* a, t* b, variable_type type, 
 	if(size > 0 and type != array)
 		type = string;
 	if(type != array)
-		print_ut_result(a, b, assertion_type, assert_eq_cond, result, type, size);
+		print_ut_result(a, b, assertion_type, assert_eq_cond, result, type, size, is_verbose);
 	else
-		print_ut_result( a[0], b[0], assertion_type, assert_eq_cond, result, type, size);
+		print_ut_result( a[0], b[0], assertion_type, assert_eq_cond, result, type, size, is_verbose);
 }
 
 template <typename t>
-void Test:: assertEqual (const char* test_name, t a, t b, variable_type type, uint16_t size){
+void Test:: assertEqual (const char* test_name, t a, t b, variable_type type, uint16_t size, verbose::verbose is_verbose){
 	print_test_name(test_name);
 	char* result;
 	char* assert_eq_cond;
@@ -132,11 +139,11 @@ void Test:: assertEqual (const char* test_name, t a, t b, variable_type type, ui
 	}
 	if(size > 0 and type != array)
 		type = string;
-	print_ut_result(a, b, assertion_type, assert_eq_cond, result, type, size);
+	print_ut_result(a, b, assertion_type, assert_eq_cond, result, type, size, is_verbose);
 }
 
 template <typename t>
-void Test:: assertNotEqual (const char* test_name, t* a, t* b, variable_type type, uint16_t size){
+void Test:: assertNotEqual (const char* test_name, t* a, t* b, variable_type type, uint16_t size, verbose::verbose is_verbose){
 	print_test_name(test_name);
 	char* result;
 	char* assert_eq_cond;
@@ -154,13 +161,13 @@ void Test:: assertNotEqual (const char* test_name, t* a, t* b, variable_type typ
 	if(size > 0 and type != array)
 		type = string;
 	if(type != array)
-		print_ut_result(a, b, assertion_type, assert_eq_cond, result, type, size);
+		print_ut_result(a, b, assertion_type, assert_eq_cond, result, type, size, is_verbose);
 	else
-		print_ut_result(a, b, assertion_type, assert_eq_cond, result, type, size);
+		print_ut_result(a, b, assertion_type, assert_eq_cond, result, type, size, is_verbose);
 }
 
 template <typename t>
-void Test:: assertNotEqual (const char* test_name, t a, t b, variable_type type, uint16_t size){
+void Test:: assertNotEqual (const char* test_name, t a, t b, variable_type type, uint16_t size, verbose::verbose is_verbose){
 	print_test_name(test_name);
 	char* result;
 	char* assert_eq_cond;
@@ -177,7 +184,7 @@ void Test:: assertNotEqual (const char* test_name, t a, t b, variable_type type,
 	}
 	if(size > 0 and type != array)
 		type = string;
-	print_ut_result(a, b, assertion_type, assert_eq_cond, result, type, size);
+	print_ut_result(a, b, assertion_type, assert_eq_cond, result, type, size, is_verbose);
 }
 
 template <typename t>
@@ -209,32 +216,34 @@ bool Test::is_mem_equal(t* a, t* b, uint16_t size){
 }
 
 template <typename t>
-void Test::print_ut_result(t& val_a, t& val_b, char* assertion_type, char* assert_eq_cond, char* result, variable_type type, uint16_t size){
-	switch (type) {
-		case numeric:
-			printf("%s %ld %s %ld ", assertion_type, (long int)val_a, assert_eq_cond, (long int)val_b);
-			break;
-		case character:
-			printf("%s %c %s %c ", assertion_type, val_a, assert_eq_cond, val_b);
-			break;
-		case string:
-			printf("%s %s %s %s ", assertion_type, val_a, assert_eq_cond, val_b);
-			break;
-		case array:
-			{	t* pa = &val_a;
-				t* pb = &val_b;
-				printf("%s ", assertion_type);
-				for(uint16_t i=0; i<size/sizeof(t); i++){
-					printf("%d, ", pa[i]);
+void Test::print_ut_result(t& val_a, t& val_b, char* assertion_type, char* assert_eq_cond, char* result, variable_type type, uint16_t size,  verbose::verbose is_verbose){
+	if(is_verbose){
+		switch (type) {
+			case numeric:
+				printf("%s %ld %s %ld ", assertion_type, (long int)val_a, assert_eq_cond, (long int)val_b);
+				break;
+			case character:
+				printf("%s %c %s %c ", assertion_type, val_a, assert_eq_cond, val_b);
+				break;
+			case string:
+				printf("%s %s %s %s ", assertion_type, val_a, assert_eq_cond, val_b);
+				break;
+			case array:
+				{	t* pa = &val_a;
+					t* pb = &val_b;
+					printf("%s ", assertion_type);
+					for(uint16_t i=0; i<size/sizeof(t); i++){
+						printf("%d, ", pa[i]);
+					}
+					printf(" %s ", assert_eq_cond);
+					for(uint16_t i=0; i<size/sizeof(t); i++){
+						printf("%d, ", pb[i]);
+					}
 				}
-				printf(" %s ", assert_eq_cond);
-				for(uint16_t i=0; i<size/sizeof(t); i++){
-					printf("%d, ", pb[i]);
-				}
-			}
-			break;
-		default:
-			break;
+				break;
+			default:
+				break;
+		}
 	}
 	printf("%s\n\n", result);
 }
